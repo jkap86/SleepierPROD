@@ -24,7 +24,7 @@ app.use(express.static(path.resolve(__dirname, '../client/build')));
 
 const connectionString = process.env.DATABASE_URL || 'postgres://dev:password123@localhost:5432/dev'
 const ssl = process.env.HEROKU ? { rejectUnauthorized: false } : false
-const db = new Sequelize(connectionString, { dialect: 'postgres' })
+const db = new Sequelize(connectionString, { dialect: 'postgres', dialectOptions: { ssl: ssl } })
 
 bootServer(app, axios, db)
 
