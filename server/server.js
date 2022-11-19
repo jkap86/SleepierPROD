@@ -39,10 +39,12 @@ app.get('/user', async (req, res, next) => {
         res.send(user)
     }
 }, async (req, res, next) => {
-    const user_db = await updateUser(axios, app.get('users_table'), req.user, app.get('state').season)
-    req.user_db = user_db.user
-    req.leagues = user_db.leagues
-    next()
+    if (app.get('users_table')) {
+        const user_db = await updateUser(axios, app.get('users_table'), req.user, app.get('state').season)
+        req.user_db = user_db.user
+        req.leagues = user_db.leagues
+        next()
+    }
 }, async (req, res, next) => {
     const leagues_user = await updateLeaguesUser(axios, app.get('leagues_table'), req.leagues, req.user_db.user_id)
     res.send({
