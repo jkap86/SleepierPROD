@@ -12,10 +12,7 @@ const getUser = async (axios, username) => {
 
 const updateUser = async (axios, users_table, user, season) => {
     const leagues = await axios.get(`https://api.sleeper.app/v1/user/${user.user_id}/leagues/nfl/${season}`)
-    const league_ids = []
-    leagues.data.map((league, index) => {
-        return league_ids[index] = league.league_id
-    })
+    const league_ids = leagues.data.map(league => league.league_id)
     const [user_db, created] = await users_table.findOrCreate({
         where: { user_id: user.user_id },
         defaults: {

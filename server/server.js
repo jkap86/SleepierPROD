@@ -10,8 +10,6 @@ const axios = require('axios').create({
     },
     timeout: 5000
 })
-const cluster = require('cluster');
-const totalCPUs = require('os').cpus().length;
 const { bootServer } = require('./routes/bootServer');
 const { getUser, updateUser } = require('./routes/user');
 const { updateLeaguesUser, updateLeague } = require('./routes/leagues');

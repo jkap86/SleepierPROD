@@ -20,9 +20,6 @@ const updateLeaguesUser = async (axios, leagues_table, leagues, user_id) => {
         ])
 
         const new_league = await leagues_table.create({
-            index: leagues.findIndex(l => {
-                return l.league_id === league.league_id
-            }),
             league_id: league.league_id,
             name: league.name,
             avatar: league.avatar,
@@ -58,10 +55,14 @@ const updateLeaguesUser = async (axios, leagues_table, leagues, user_id) => {
                 const userRoster = standings?.find(r => r.owner_id === user_id || r.co_owners?.includes(user_id))
                 return {
                     ...league,
+                    index: leagues.findIndex(l => {
+                        return l.league_id === league.league_id
+                    }),
                     userRoster: userRoster
                 }
             })
             .filter(league => league.userRoster?.players?.length > 0)
+            .sort((a, b) => a.index - b.index)
     )
 }
 
