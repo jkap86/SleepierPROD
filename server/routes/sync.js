@@ -1,4 +1,4 @@
-const { updateAllLeagues } = require("./leagues")
+const { updateAllLeagues, updateAllLeagues_Rosters } = require("./leagues")
 const { getWeeklyRankings } = require('./playersDict');
 
 const sync_daily = async (axios, leagues_table) => {
@@ -16,8 +16,11 @@ const sync_daily = async (axios, leagues_table) => {
     }, delay)
 }
 
-const sync_15min = (app, axios) => {
+const sync_15min = (app, axios, leagues_table) => {
+
     setInterval(async () => {
+        const updateCount = await updateAllLeagues(axios, leagues_table)
+        console.log(`${updateCount} league rosters updated at ${new Date()}...`)
         let allplayers = app.get('allplayers')
         const html = await axios.get('https://www.fantasypros.com/nfl/rankings/ppr-superflex.php')
         const weekly_rankings = await getWeeklyRankings(html.data)

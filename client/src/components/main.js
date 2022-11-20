@@ -153,12 +153,14 @@ const Main = () => {
                 }
             })
             if (user.data?.leagues) {
+                const allplayers = await axios.get('/allplayers')
+
                 setState_User(user.data.user)
 
                 setStateLeagues(user.data.leagues)
                 getPlayerShares(user.data.leagues, user.data.user.user_id)
                 getLeaguemates(user.data.leagues, user.data.user.user_id)
-                const allplayers = await axios.get('/allplayers')
+
                 setStateAllPlayers(allplayers.data)
 
             } else {

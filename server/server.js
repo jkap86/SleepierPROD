@@ -28,7 +28,7 @@ bootServer(app, axios, db)
 
 sync_daily(axios, app.get('leagues_table'))
 
-sync_15min(app, axios)
+sync_15min(app, axios, app.get('leagues_table'))
 
 app.get('/user', async (req, res, next) => {
     const user = await getUser(axios, req.query.username)
