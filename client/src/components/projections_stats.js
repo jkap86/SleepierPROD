@@ -129,7 +129,8 @@ export const getLineupCheck = (roster_positions, roster, allplayers, includeTaxi
             const samePos = lineup_check.filter(x =>
                 allplayers[x.cur_id]?.position === allplayers[lc.cur_id]?.position &&
                 allplayers[x.cur_id]?.position === x.slot &&
-                x.game_slot > lc.game_slot && !(includeLocked < 0 && (lc.game_slot < now_slot || x.game_slot < now_slot))
+                x.game_slot > lc.game_slot && x.game_slot - lc.game_slot > 0.05 &&
+                !(includeLocked < 0 && (lc.game_slot < now_slot || x.game_slot < now_slot))
             )
 
             isInOptimalOrdered = (isInFlex && samePos.length > 0) ? 'E' : null
@@ -141,7 +142,8 @@ export const getLineupCheck = (roster_positions, roster, allplayers, includeTaxi
             const samePos = lineup_check.filter(x =>
                 allplayers[x.cur_id]?.position === allplayers[lc.cur_id]?.position &&
                 allplayers[x.cur_id]?.position !== x.slot &&
-                x.game_slot < lc.game_slot && !(includeLocked < 0 && (lc.game_slot < now_slot || x.game_slot < now_slot))
+                x.game_slot < lc.game_slot && lc.game_slot - x.game_slot > 0.05 &&
+                !(includeLocked < 0 && (lc.game_slot < now_slot || x.game_slot < now_slot))
             )
 
             if (Math.floor(lc.game_slot) === 7) {
