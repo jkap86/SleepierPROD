@@ -15,8 +15,8 @@ const updateLeaguesUser = async (axios, leagues_table, leagues, user_id) => {
         .filter(l => !leagues_user_db.find(l_db => l_db.league_id === l.league_id))
     await Promise.all(leagues_to_update.map(async league => {
         const [users, rosters] = await Promise.all([
-            await axios.get(`https://api.sleeper.app/v1/league/${league.league_id}/users`),
-            await axios.get(`https://api.sleeper.app/v1/league/${league.league_id}/rosters`)
+            await axios.get(`http://api.sleeper.app/v1/league/${league.league_id}/users`),
+            await axios.get(`http://api.sleeper.app/v1/league/${league.league_id}/rosters`)
         ])
 
         const new_league = await leagues_table.create({
@@ -78,9 +78,9 @@ const updateAllLeagues = async (axios, leagues_table) => {
     let updateCount = 0
     await Promise.all(leagues_to_update.map(async league_to_update => {
         const [league, users, rosters] = await Promise.all([
-            await axios.get(`https://api.sleeper.app/v1/league/${league_to_update.league_id}`),
-            await axios.get(`https://api.sleeper.app/v1/league/${league_to_update.league_id}/users`),
-            await axios.get(`https://api.sleeper.app/v1/league/${league_to_update.league_id}/rosters`)
+            await axios.get(`http://api.sleeper.app/v1/league/${league_to_update.league_id}`),
+            await axios.get(`http://api.sleeper.app/v1/league/${league_to_update.league_id}/users`),
+            await axios.get(`http://api.sleeper.app/v1/league/${league_to_update.league_id}/rosters`)
         ])
 
         const new_league = await leagues_table.update({
@@ -104,9 +104,9 @@ const updateAllLeagues = async (axios, leagues_table) => {
 
 const updateLeague = async (axios, leagues_table, league_id, user_id) => {
     const [league, rosters, users] = await Promise.all([
-        await axios.get(`https://api.sleeper.app/v1/league/${league_id}`),
-        await axios.get(`https://api.sleeper.app/v1/league/${league_id}/rosters`),
-        await axios.get(`https://api.sleeper.app/v1/league/${league_id}/users`)
+        await axios.get(`http://api.sleeper.app/v1/league/${league_id}`),
+        await axios.get(`http://api.sleeper.app/v1/league/${league_id}/rosters`),
+        await axios.get(`http://api.sleeper.app/v1/league/${league_id}/users`)
     ])
     rosters.data
         .sort((a, b) => b.settings.fpts - a.settings.fpts)
