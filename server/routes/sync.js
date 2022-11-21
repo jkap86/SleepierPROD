@@ -1,5 +1,5 @@
 const { updateAllLeagues, updateAllLeagues_Rosters } = require("./leagues")
-const { getWeeklyRankings } = require('./playersDict');
+const { getPlayersDict, getWeeklyRankings } = require('./playersDict');
 
 const sync_daily = async (axios, leagues_table) => {
     const date = new Date()
@@ -7,9 +7,11 @@ const sync_daily = async (axios, leagues_table) => {
     const minute = date.getMinutes()
     const delay = ((Math.max(4 - hour, 27 - hour) * 60) + (60 - minute)) * 60 * 1000
     setTimeout(async () => {
-        const updateCount = await updateAllLeagues(axios, leagues_table)
-        console.log(`${updateCount} leagues updated at ${new Date()}...`)
         setInterval(async () => {
+            const state = await axios.get('https://api.sleeper.app/v1/state/nfl')
+            app.set('state', state.data)
+            const allplayers = await getPlayersDict(axios, state.data.week)
+            app.set('allplayers', allplayers)
             const updateCount = await updateAllLeagues(axios, leagues_table)
             console.log(`${updateCount} leagues updated at ${new Date()}...`)
         }, 24 * 60 * 60 * 1000)

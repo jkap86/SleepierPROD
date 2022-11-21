@@ -21,7 +21,11 @@ const getPlayersDict = async (axios, week) => {
     const sheetName = workbook.SheetNames[0]
     const worksheet = workbook.Sheets[sheetName]
     const players_dict = utils.sheet_to_json(worksheet).filter(j => j.sleeper_id)
-    const sleeper_active = Object.keys(sleeper_players.data).filter(p => sleeper_players.data[p].active === true)
+    const sleeper_active = Object.keys(sleeper_players.data)
+        .filter(p =>
+            sleeper_players.data[p].active === true &&
+            ['QB', 'RB', 'FB', 'WR', 'TE'].includes(sleeper_players.data[p]?.position)
+        )
     const weekly_rankings = await getWeeklyRankings(fantasypros.data)
     let allplayers = {}
     sleeper_active.map(sleeper_id => {
