@@ -79,7 +79,8 @@ export const getLineupCheck = (roster_positions, roster, allplayers, includeTaxi
 
         const optimal_options = optimal_lineup.filter(op =>
             !roster.starters.includes(op) &&
-            position_map[slot].includes(allplayers[op]?.position)
+            position_map[slot].includes(allplayers[op]?.position) &&
+            player_ranks.find(pr => pr.id === op)?.rank < player_ranks.find(pr => pr.id === cur_id)?.rank
         )
 
         const slot_abbrev = slot
@@ -109,19 +110,25 @@ export const getLineupCheck = (roster_positions, roster, allplayers, includeTaxi
 
     lineup_check = lineup_check.map((lc) => {
         let swaps;
-        /*
-        if (!lc.isInOptimal && lc.optimal_options.length === 0) {
-            const swap_out = lineup_check
-                .filter(x =>
-                    x.isInOptimal && x.optimal_options.length > 0 &&
-                    position_map[x.slot].includes(allplayers[lc.cur_id]?.position) &&
-                    position_map[lc.slot].includes(allplayers[x.cur_id]?.position)
-                )
-                .sort((a, b) => a.cur_rank - b.cur_rank)
+        let isInOptimal = lc.isInOptimal
+        if (!isInOptimal && lc.optimal_options.length === 0) {
+            const subs_all = Array.from(new Set(lineup_check.map(x => x.optimal_options).flat()))
+            const sub_in = optimal_lineup.filter(op => !roster.starters.includes(op) && !subs_all.includes(op))
+            if (sub_in.length === 0) {
+                isInOptimal = true
+            } else {
+                const swap_out = lineup_check
+                    .filter(x =>
+                        x.isInOptimal && x.optimal_options.length > 0 &&
+                        position_map[x.slot].includes(allplayers[lc.cur_id]?.position) &&
+                        position_map[lc.slot].includes(allplayers[x.cur_id]?.position)
+                    )
+                    .sort((a, b) => a.cur_rank - b.cur_rank)
 
-            swaps = swap_out[0]
+                swaps = swap_out[0]
+            }
         }
-        */
+
         let isInOptimalOrdered;
         let tv_slot = '***'
         if (lc.game_slot < 7.12 && lc.isInOptimal) {
