@@ -18,7 +18,7 @@ const sync_15min = async (app, axios, leagues_table) => {
     const html = await axios.get('https://www.fantasypros.com/nfl/rankings/ppr-superflex.php')
     const weekly_rankings = await getWeeklyRankings(html.data)
     weekly_rankings.map(fantasypros_player => {
-        const sleeper_id = Object.keys(allplayers).find(player_id => allplayers[player_id].fantasypros_id === fantasypros_player.player_id.toString())
+        const sleeper_id = Object.keys(allplayers).find(player_id => allplayers[player_id].fantasypros_id === fantasypros_player.player_id?.toString())
         if (sleeper_id) {
             allplayers[sleeper_id] = {
                 ...allplayers[sleeper_id],
