@@ -31,7 +31,7 @@ const getPlayersDict = async (axios, week) => {
     sleeper_active.map(sleeper_id => {
         const sleeper_player = sleeper_players.data[sleeper_id]
         const dynProc_player = players_dict.find(x => x.sleeper_id.toString() === sleeper_id.toString())
-        const fantasypros_player = weekly_rankings.find(x => x.player_id?.toString() === dynProc_player?.fantasypros_id.toString())
+        const fantasypros_player = weekly_rankings.find(x => x.player_id.toString() === dynProc_player?.fantasypros_id.toString())
 
         allplayers[sleeper_id] = {
             full_name: sleeper_player?.full_name,
@@ -79,7 +79,12 @@ const getWeeklyRankings = async (html) => {
         .replace(/},{/g, "}-----{")
         .split('-----')
 
-    return rankings
+    let rankings_parsed = rankings.map(rank => {
+        let parsed = JSON.parse(rank)
+        return parsed
+    })
+
+    return rankings_parsed
 }
 
 
