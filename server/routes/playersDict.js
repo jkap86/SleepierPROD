@@ -79,11 +79,7 @@ const getWeeklyRankings = async (html) => {
         .replace(/},{/g, "}-----{")
         .split('-----')
 
-    let rankings_parsed = rankings.map(rank => {
-        let parsed = JSON.parse(rank)
-        parsed['week'] = week[0]
-        return parsed
-    })
+
 
     return rankings_parsed
 }

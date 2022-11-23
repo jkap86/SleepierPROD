@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import axios from 'axios';
 import sleeperLogo from '../images/sleeper_icon.png';
 import View from "./view";
@@ -12,13 +12,6 @@ const Main = () => {
     const [stateLeagues, setStateLeagues] = useState([]);
     const [stateLeaguemates, setStateLeaguemates] = useState([]);
     const [statePlayerShares, setStatePlayerShares] = useState([]);
-
-    console.log({
-        allplayers: stateAllPlayers,
-        leagues: stateLeagues,
-        players: statePlayerShares,
-        leaguemates: stateLeaguemates
-    })
 
     const getPlayerShares = (leagues, user_id) => {
         const getPlayerCount = (players, user_id, leagues) => {

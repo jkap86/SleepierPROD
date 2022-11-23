@@ -2,11 +2,11 @@ import { Link } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { avatar } from './misc_functions';
 import sleeperLogo from '../images/sleeper_icon.png';
-const LeaguesLineupCheck = React.lazy(() => import('./Leagues/leaguesLineupCheck'));
+const LineupsTab = React.lazy(() => import('./Lineups/lineupsTab'));
 const Leagues = React.lazy(() => import('./Leagues/leagues'));
 const Players = React.lazy(() => import('./Players/players'));
 const Leaguemates = React.lazy(() => import('./Leaguemates/leaguemates'));
-const PlayersRankProj = React.lazy(() => import('./Players/playersRank_Proj'));
+const PlayersRankProj = React.lazy(() => import('./Lineups/playersRank_Proj'));
 
 const View = ({ isLoading, stateAllPlayers, state_user, stateLeagues, stateLeaguemates, statePlayerShares, syncLeague, sendRankEdit }) => {
     const [stateLeaguesFiltered, setStateLeaguesFiltered] = useState([]);
@@ -249,10 +249,10 @@ const View = ({ isLoading, stateAllPlayers, state_user, stateLeagues, stateLeagu
         case 'Lineup Check':
             display = isLoading ? loadingMessage :
                 <React.Suspense fallback={loadingMessage}>
-                    <LeaguesLineupCheck
-                        prop_leagues={stateLeaguesFiltered}
-                        allplayers={stateAllPlayers}
-                        user_id={state_user.user_id}
+                    <LineupsTab
+                        propLeagues={stateLeaguesFiltered}
+                        propAllplayers={stateAllPlayers}
+                        propUser={state_user}
                         includeTaxi={includeTaxi}
                         includeLocked={includeLocked}
                         setIncludeLocked={setIncludeLocked}

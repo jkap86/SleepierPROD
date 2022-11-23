@@ -1,24 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { avatar } from "../misc_functions";
-import { getLineupCheck } from '../projections_stats';
+import { getLineupCheck } from './lineupFunctions';
 import taxi from '../../images/taxi.png';
 import locked from '../../images/locked.png';
 const Search = React.lazy(() => import('../search'));
 const LineupBreakdown = React.lazy(() => import('./lineupBreakdown'));
+const TableMain = React.lazy(() => import('../tableMain'));
 
-const LeaguesLineupCheck = ({ prop_leagues, allplayers, syncLeague, user_id, includeTaxi, setIncludeTaxi, rankMargin, setRankMargin, includeLocked, setIncludeLocked }) => {
-    const [syncing, setSyncing] = useState(false)
-    const [tab, setTab] = useState('Lineup Check');
+const LineupCheck = ({ propLeagues, propAllplayers, includeTaxi, setIncludeTaxi, includeLocked, setIncludeLocked, rankMargin, setRankMargin, syncLeague, propUser, tab, setTab }) => {
     const [searched, setSearched] = useState('')
-    const [activeSlot, setActiveSlot] = useState(null)
     const [page, setPage] = useState(1)
+    const [leagues, setLeagues] = useState([])
+    const [syncing, setSyncing] = useState(false)
+    const [activeSlot, setActiveSlot] = useState(null)
     const [rostersVisible, setRostersVisible] = useState('')
     const rowRef = useRef(null)
-    const [leagues, setLeagues] = useState([])
 
     useEffect(() => {
-        const l = prop_leagues.map(l => {
-            const league_check = getLineupCheck(l.roster_positions, l.userRoster, allplayers, parseInt(includeTaxi), parseInt(rankMargin), parseInt(includeLocked))
+        const sl = propLeagues.map(l => {
+            const league_check = getLineupCheck(l.roster_positions, l.userRoster, propAllplayers, parseInt(includeTaxi), parseInt(rankMargin), parseInt(includeLocked))
+
             const empty_slots = l.userRoster.starters?.filter(s => s === '0').length
             const bye_slots = league_check.filter(slot => slot.cur_rank === 1000).map(slot => slot.cur_id).length
             const so_slots = league_check.filter(slot => !slot.isInOptimal).length
@@ -31,15 +32,20 @@ const LeaguesLineupCheck = ({ prop_leagues, allplayers, syncLeague, user_id, inc
                 bye_slots: bye_slots,
                 so_slots: so_slots,
                 qb_in_sf: league_check
-                    .filter(slot => slot.slot === 'SUPER_FLEX' && allplayers[slot.cur_id]?.position !== 'QB').length,
+                    .filter(slot => slot.slot === 'SUPER_FLEX' && propAllplayers[slot.cur_id]?.position !== 'QB').length,
                 lineup_check: league_check,
                 early_slots: early_slots,
                 late_slots: late_slots
             }
-        })
-        setLeagues([...l])
 
-    }, [prop_leagues, includeTaxi, includeLocked, rankMargin, allplayers])
+        })
+        setLeagues([...sl])
+
+    }, [propLeagues, includeTaxi, includeLocked, rankMargin, propAllplayers])
+
+    useEffect(() => {
+        setPage(1)
+    }, [searched])
 
     useEffect(() => {
         if (rostersVisible !== '' && activeSlot) {
@@ -53,10 +59,6 @@ const LeaguesLineupCheck = ({ prop_leagues, allplayers, syncLeague, user_id, inc
         setActiveSlot(null)
     }, [rostersVisible])
 
-    useEffect(() => {
-        setPage(1)
-    }, [searched])
-
     const handleSyncLeague = (league_id, user_id) => {
         setSyncing(true)
         syncLeague(league_id, user_id)
@@ -65,44 +67,31 @@ const LeaguesLineupCheck = ({ prop_leagues, allplayers, syncLeague, user_id, inc
         }, 5000)
     }
 
-    const header = (
-        <>
-            <tr className='main_header double'>
-                <th colSpan={2}></th>
-                <th colSpan={4}># Slots</th>
-            </tr>
-            <tr className="main_header double">
-                <th colSpan={2}
-                    className={'clickable'}
-                >
-                    League
-                </th>
-                <th colSpan={1}
-                    className={'small clickable'}
-                >
-                    Suboptimal
-                </th>
-                <th colSpan={1}
-                    className={'small clickable'}
-                >
-                    Early in Flex
-                </th>
-                <th colSpan={1}
-                    className={'small clickable'}
-                >
-                    Late not in Flex
-                </th>
-                <th colSpan={1}
-                    className={'small clickable'}
-                >
-                    Non QBs in SF
-                </th>
-            </tr>
-        </>
-    )
-
     const leagues_display = searched.trim().length === 0 ? leagues :
         leagues.filter(x => x.name.trim() === searched.trim())
+
+
+    const headers = [
+        {
+            type: 'double',
+            columns: [
+                ['', 2],
+                ['# Slots', 4]
+            ]
+        },
+        {
+            type: 'double',
+            columns: [
+                ['League', 2, 'clickable'],
+                ['Suboptimal', 1, 'small clickable'],
+                ['Early in Flex', 1, 'small clickable'],
+                ['Late not in Flex', 1, 'small clickable'],
+                ['Non QBs in SF', 1, 'small clickable']
+            ]
+        }
+    ]
+
+
 
     const display = (
         <>
@@ -195,7 +184,7 @@ const LeaguesLineupCheck = ({ prop_leagues, allplayers, syncLeague, user_id, inc
                                                                 </div>
                                                                 <button
                                                                     className={'clickable'}
-                                                                    onClick={() => handleSyncLeague(league.league_id, user_id)}
+                                                                    onClick={() => handleSyncLeague(league.league_id, propUser.user_id)}
                                                                     style={{ visibility: `${syncing ? 'hidden' : ''}` }}
                                                                 >
                                                                     Sync League
@@ -212,7 +201,7 @@ const LeaguesLineupCheck = ({ prop_leagues, allplayers, syncLeague, user_id, inc
                                                                     roster={league.userRoster}
                                                                     lineup_check={league.lineup_check}
                                                                     avatar={avatar}
-                                                                    allplayers={allplayers}
+                                                                    allplayers={propAllplayers}
                                                                     activeSlot={activeSlot}
                                                                     setActiveSlot={(slot) => setActiveSlot(slot)}
                                                                     includeTaxi={includeTaxi}
@@ -229,7 +218,7 @@ const LeaguesLineupCheck = ({ prop_leagues, allplayers, syncLeague, user_id, inc
                     )
             }
             {
-                (((page - 1) * 25) + 25) < leagues_display.length ?
+                (((page - 1) * 25) + 25) < propLeagues.length ?
                     <tbody>
                         <tr
                             className={'clickable'}
@@ -306,12 +295,12 @@ const LeaguesLineupCheck = ({ prop_leagues, allplayers, syncLeague, user_id, inc
                 </label>
             </div>
         </div>
-        <table className="main">
-            <thead className="main">
-                {header}
-            </thead>
-            {display}
-        </table>
+        <TableMain
+            headers={headers}
+            body={display}
+            page={page}
+            setPage={setPage}
+        />
     </>
 }
-export default LeaguesLineupCheck;
+export default LineupCheck;
