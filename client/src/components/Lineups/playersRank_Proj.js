@@ -371,6 +371,12 @@ const PlayersRankProj = ({ playershares, allplayers, sendRankEdit, tab, setTab }
                 >
                     Lineup Check
                 </button>
+                <button
+                    className={tab === 'Starters' ? 'active clickable' : 'clickable'}
+                    onClick={() => setTab('Weekly Rankings')}
+                >
+                    Starters
+                </button>
             </div>
         </div>
         <table className="main">

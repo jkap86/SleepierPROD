@@ -15,6 +15,9 @@ const LineupCheck = ({ propLeagues, propAllplayers, includeTaxi, setIncludeTaxi,
     const [activeSlot, setActiveSlot] = useState(null)
     const [rostersVisible, setRostersVisible] = useState('')
     const rowRef = useRef(null)
+    const [showOptions, setShowOptions] = useState(false)
+    const tabRef = useRef(null)
+
 
     useEffect(() => {
         const sl = propLeagues.map(l => {
@@ -233,7 +236,9 @@ const LineupCheck = ({ propLeagues, propAllplayers, includeTaxi, setIncludeTaxi,
         </>
     )
 
-    return <>
+    return <div
+        onClick={(e) => !tabRef.current.contains(e.target) ? setShowOptions(false) : null}
+    >
         <React.Suspense fallback={<>...</>}>
             <Search
                 list={leagues.map(league => league.name)}
@@ -264,42 +269,67 @@ const LineupCheck = ({ propLeagues, propAllplayers, includeTaxi, setIncludeTaxi,
                 >
                     Lineup Check
                 </button>
-            </div>
-            <div className={'lineupcheck_options'}>
-                <div className={'lineupcheck_option'}>
-                    <img
-                        className={'taxi'}
-                        src={locked}
-                    />
-                    <i
-                        onClick={() => setIncludeLocked(prevState => prevState === 1 ? -1 : 1)}
-                        className={`fa fa-ban clickable ${includeLocked > 0 ? 'hidden' : null}`}>
-
-                    </i>
-                </div>
-                <div className={'lineupcheck_option'}>
-                    <img
-                        className={'taxi'}
-                        src={taxi}
-                    />
-                    <i
-                        onClick={() => setIncludeTaxi(prevState => prevState === 1 ? -1 : 1)}
-                        className={`fa fa-ban clickable ${includeTaxi > 0 ? 'hidden' : null}`}>
-
-                    </i>
-                </div>
-                <label>
-                    Rank Margin
-                    <select
-                        value={rankMargin}
-                        onChange={(e) => setRankMargin(e.target.value)}
+                <button
+                    className={tab === 'Starters' ? 'active clickable' : 'clickable'}
+                    onClick={() => setTab('Weekly Rankings')}
+                >
+                    Starters
+                </button>
+                <div
+                    className={'options_container'}
+                    ref={tabRef}
+                >
+                    <button
+                        className={'options click'}
+                        onMouseDown={() => setShowOptions(prevState => !prevState)}
                     >
-                        {Array.from(Array(50).keys()).map(key =>
-                            <option key={key + 1}>{key + 1}</option>
-                        )}
-                    </select>
-                </label>
+                        Options &or;
+                    </button>
+                    <div
+                        className='options'
+                        hidden={!showOptions}
+
+                    >
+                        <div className={'lineupcheck_option click'}>
+                            <img
+                                className={'taxi'}
+                                src={locked}
+                            />
+                            <i
+                                onClick={() => setIncludeLocked(prevState => prevState === 1 ? -1 : 1)}
+                                className={`fa fa-ban clickable ${includeLocked > 0 ? 'hidden' : null}`}>
+
+                            </i>
+                        </div>
+                        <div className={'lineupcheck_option click'}>
+                            <img
+                                className={'taxi'}
+                                src={taxi}
+                            />
+                            <i
+                                onClick={() => setIncludeTaxi(prevState => prevState === 1 ? -1 : 1)}
+                                className={`fa fa-ban clickable ${includeTaxi > 0 ? 'hidden' : null}`}>
+
+                            </i>
+                        </div>
+                        <div className={'lineupcheck_option click'}>
+                            <label>
+                                Rank Margin
+                                <select
+                                    className={'click'}
+                                    value={rankMargin}
+                                    onChange={(e) => setRankMargin(e.target.value)}
+                                >
+                                    {Array.from(Array(50).keys()).map(key =>
+                                        <option key={key + 1}>{key + 1}</option>
+                                    )}
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                </div>
             </div>
+
         </div>
         <TableMain
             headers={headers}
@@ -307,6 +337,6 @@ const LineupCheck = ({ propLeagues, propAllplayers, includeTaxi, setIncludeTaxi,
             page={page}
             setPage={setPage}
         />
-    </>
+    </div>
 }
 export default LineupCheck;

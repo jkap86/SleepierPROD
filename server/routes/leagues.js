@@ -114,8 +114,18 @@ const updateAllLeagues_Rosters = async (axios, leagues_table) => {
     let i = 0
     while (i < leagues_to_update.length) {
         await Promise.all(leagues_to_update.slice(i, i + 500).map(async league_to_update => {
-            const rosters = await axios.get(`http://api.sleeper.app/v1/league/${league_to_update.league_id}/rosters`)
-
+            let rosters;
+            try {
+                rosters = await axios.get(`http://api.sleeper.app/v1/league/${league_to_update.league_id}/rosters`)
+            } catch (error) {
+                if (error.request) {
+                    console.log(error.request)
+                } else if (error.response) {
+                    console.log(error.response)
+                } else {
+                    console.log(error)
+                }
+            }
             const new_league = await leagues_table.update({
                 rosters: rosters.data
             }, {

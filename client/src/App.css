@@ -55,6 +55,7 @@ input.editRank {
 i {
   position: relative;
   font-size: 2vh;
+  width: fit-content;
 }
 
 i.green {
@@ -79,7 +80,7 @@ i.right {
 
 i.fa-ban,
 i.fa-ban::before {
-  font-size: 5rem;
+  font-size: 7.5rem;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -405,6 +406,9 @@ div.tab {
   padding-bottom: 25vh;
 }
 
+div.tab>div {
+  background-color: inherit;
+}
 
 div.tab>button {
   font-size: 2rem;
@@ -595,11 +599,10 @@ img.thumbnail.small {
 }
 
 img.taxi {
-  box-shadow: none;
   margin: .5rem;
-  width: 4rem;
-  height: 4rem;
-
+  width: 7.5rem;
+  height: 7.5rem;
+  filter: contrast(2);
 }
 
 th.small {
@@ -751,7 +754,7 @@ div.nav1 {
   z-index: 10;
   height: 5rem;
   top: 5rem;
-  background: var(--color1);
+  background-color: inherit;
   filter: drop-shadow(0 0 1rem var(--color2));
   display: flex;
   justify-content: center;
@@ -760,43 +763,88 @@ div.nav1 {
   margin: auto;
 }
 
-
-div.nav1>div.nav1_button_wrapper {
+div.nav1 {
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
+  white-space: nowrap;
 }
 
-div.nav1>div.lineupcheck_options {
+div.options_container {
+  display: inline-flex;
   position: absolute;
-  float: right;
+  width: fit-content;
+  height: fit-content;
+  border: .5rem groove var(--color4);
+}
+
+button.options {
+  background-color: var(--wr);
+  color: var(--color9);
+  filter: contrast(2);
+  font-weight: 900;
+  text-shadow: none;
+  position: relative;
+  z-index: 10;
+  padding: .25rem;
+  margin: auto;
+  border: .5rem ridge var(--color9);
+}
+
+div.options {
+  position: absolute;
+  width: 100%;
+  height: inherit;
+  margin: auto;
+  margin-top: -4rem;
   top: 0;
-  bottom: 0;
-  right: 0;
-  display: flex;
-  flex-direction: row;
-  justify-content: right;
-  width: 25%;
+  bottom: -9999rem;
+  right: -9999rem;
+  left: -9999rem;
+  padding: 4rem;
+  padding-top: 8rem;
 }
 
 div.lineupcheck_option {
   position: relative;
-  width: 25%;
+  z-index: 2;
+  background-color: rgba(255, 255, 255, .25);
+  filter: contrast(2);
+  margin: auto;
 }
 
-div.nav1>div.lineupcheck_options>label {
+div.lineupcheck_option>img,
+div.nav1 label>select {
+  filter: drop-shadow(0rem 0rem .5rem var(--color8)) drop-shadow(0rem 0rem 1rem var(--color8));
+}
+
+
+div.options_container,
+div.nav1>div.nav1_button_wrapper>button {
+  margin: auto 1rem;
+}
+
+div.nav1_button_wrapper {
+  margin-right: 5rem;
+}
+
+div.nav1 label {
   display: inline-flex;
   flex-direction: column;
-  font-size: 1.5rem;
-  margin: auto 2rem;
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: darkblue;
+  margin: .75rem auto;
 }
 
-div.nav1>div.lineupcheck_options>label>select {
+div.nav1 label>select {
   width: 75%;
   margin: .5rem auto;
   background-color: var(--color2);
   font-weight: 900;
   text-align: center;
   font-size: inherit;
+  border-radius: 1rem;
+  height: 4rem;
 }
 
 table.main div.nav2 {
