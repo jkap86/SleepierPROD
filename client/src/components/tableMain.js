@@ -10,10 +10,11 @@ const TableMain = ({ headers, body, page, setPage }) => {
             <thead className="main">
                 {
                     headers.map((header, index) =>
-                        <tr className={`main_header ${header.type}`}>
+                        <tr key={index} className={`main_header ${header.type}`}>
                             {
                                 header.columns.map((col, index) =>
                                     <th
+                                        key={index}
                                         colSpan={col[1]}
                                         className={col[2]}
                                     >

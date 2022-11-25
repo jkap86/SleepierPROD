@@ -63,7 +63,7 @@ const LineupBreakdown = ({ type, roster, lineup_check, avatar, allplayers, activ
             activeSlot ? activeSlot.optimal_options : null
     )
 
-    const swap = activeSlot?.swaps
+    const swaps = activeSlot?.swaps
 
 
     return <>
@@ -89,49 +89,58 @@ const LineupBreakdown = ({ type, roster, lineup_check, avatar, allplayers, activ
                 </tr>
             </thead>
             {
-                swap ?
+                swaps ?
                     <tbody>
                         <tr className={'title'}>
                             <td colSpan={6} className={'transparent'}>Swap With</td>
                         </tr>
-                        <tr className="swap">
-                            <td colSpan={1}>
-                                {
-                                    swap.slot_abbrev
-                                }
-                            </td>
-                            <td colSpan={3} className={'left'}>
-                                <p>
-                                    {
-                                        avatar(swap.cur_id, allplayers[swap.cur_id]?.full_name, 'player')
-                                    }
-                                    {`${allplayers[swap.cur_id]?.position} ${allplayers[swap.cur_id]?.full_name} ${allplayers[swap.cur_id]?.team || 'FA'}`}
-                                    {
-                                        allplayers[swap.cur_id]?.injury ?
-                                            <p className={'red small'}>
-                                                {allplayers[swap.cur_id]?.injury}
+                        {
+                            swaps
+                                ?.sort((a, b) => ((allplayers[a]?.rank_ecr || 999) - (allplayers[b]?.rank_ecr || 999)))
+                                ?.map((swap, index) =>
+                                    <tr key={index} className="swap">
+                                        <td colSpan={1}>
+                                            {
+                                                roster.taxi?.includes(swap) ? 'Taxi' :
+                                                    roster.reserve?.includes(swap) ? 'IR' :
+                                                        lineup_check.find(x => x.cur_id === swap)?.slot_abbrev || 'BN'
+                                            }
+                                        </td>
+                                        <td colSpan={3} className={'left'}>
+                                            <p>
+                                                {
+                                                    avatar(swap, allplayers[swap]?.full_name, 'player')
+                                                }
+                                                {`${allplayers[swap]?.position} ${allplayers[swap]?.full_name} ${allplayers[swap]?.team || 'FA'}`}
+                                                {
+                                                    allplayers[swap]?.injury ?
+                                                        <p className={'red small'}>
+                                                            {allplayers[swap]?.injury}
+                                                        </p>
+                                                        : null
+                                                }
                                             </p>
-                                            : null
-                                    }
-                                </p>
-                            </td>
-                            <td colSpan={1}>
-                                {allplayers[swap.cur_id]?.rank_ecr === 1000 ? 'BYE' : allplayers[swap.cur_id]?.rank_ecr || 999}
-                            </td>
-                            <td colSpan={1}>
-                                {
-                                    allplayers[swap.cur_id]?.rank_ecr >= 999 ? '-' :
-                                        allplayers[swap.cur_id]?.position === 'FB' ? 'RB' : allplayers[swap.cur_id]?.position + "" +
-                                            (Object.keys(allplayers)
-                                                .filter(ap =>
-                                                    allplayers[ap].position === allplayers[swap.cur_id]?.position ||
-                                                    (allplayers[swap.cur_id]?.position === 'FB' && ['FB', 'RB'].includes(allplayers[ap].position))
-                                                )
-                                                .sort((a, b) => (allplayers[a].rank_ecr || 999) - (allplayers[b].rank_ecr || 999))
-                                                .indexOf(swap.cur_id) + 1)
-                                }
-                            </td>
-                        </tr>
+                                        </td>
+                                        <td colSpan={1}>
+                                            {allplayers[swap]?.rank_ecr === 1000 ? 'BYE' : allplayers[swap]?.rank_ecr || 999}
+                                        </td>
+                                        <td colSpan={1}>
+                                            {
+                                                allplayers[swap]?.rank_ecr >= 999 ? '-' :
+                                                    allplayers[swap]?.position === 'FB' ? 'RB' : allplayers[swap]?.position + "" +
+                                                        (Object.keys(allplayers)
+                                                            .filter(ap =>
+                                                                allplayers[ap].position === allplayers[swap]?.position ||
+                                                                (allplayers[swap]?.position === 'FB' && ['FB', 'RB'].includes(allplayers[ap].position))
+                                                            )
+                                                            .sort((a, b) => (allplayers[a].rank_ecr || 999) - (allplayers[b].rank_ecr || 999))
+                                                            .indexOf(swap) + 1)
+                                            }
+                                        </td>
+                                    </tr>
+                                )
+                        }
+
                     </tbody>
                     : null
             }
@@ -146,7 +155,7 @@ const LineupBreakdown = ({ type, roster, lineup_check, avatar, allplayers, activ
                                 ?.sort((a, b) => (roster.taxi?.includes(a) - roster.taxi?.includes(b)) || (allplayers[a]?.rank_ecr || 999) -
                                     (allplayers[b]?.rank_ecr || 999))
                                 ?.map((bp, index) =>
-                                    <tr className={activeSlot ? 'swap' : null}>
+                                    <tr key={index} className={activeSlot ? 'swap' : null}>
                                         <td colSpan={1}>
                                             {
                                                 roster.taxi?.includes(bp) ? 'Taxi' :

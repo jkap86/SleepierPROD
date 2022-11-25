@@ -253,6 +253,12 @@ const LineupCheck = ({ propLeagues, propAllplayers, includeTaxi, setIncludeTaxi,
         <div className='nav1'>
             <div className={'nav1_button_wrapper'}>
                 <button
+                    className={tab === 'Weekly Rankings' ? 'active clickable' : 'clickable'}
+                    onClick={() => setTab('Weekly Rankings')}
+                >
+                    Weekly Rankings
+                </button>
+                <button
                     className={tab === 'Lineup Check' ? 'active clickable' : 'clickable'}
                     onClick={() => setTab('Lineup Check')}
                 >

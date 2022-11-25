@@ -109,7 +109,7 @@ export const getLineupCheck = (roster_positions, roster, allplayers, includeTaxi
             if (sub_in.length === 0) {
                 isInOptimal = true
             } else {
-                swaps = lineup_check.filter(x => !x.isInOptimal)
+                swaps = sub_in
             }
         }
         return {
@@ -172,4 +172,70 @@ export const getLineupCheck = (roster_positions, roster, allplayers, includeTaxi
 
     return lineup_check
 
+}
+
+export const matchUploadedRankings = (data, allplayers) => {
+    let r = []
+    let alerts = []
+    let unmatched_players = []
+    if (!Object.keys(data[0]).includes('Player')) {
+        alerts.push('Player/Name column not found')
+        return {
+            alerts: alerts
+        }
+    }
+    data.map(player => {
+        const name = player.Player || player.player || player.Name || player.name || 'NOT FOUND'
+        const position = player.Pos || player.pos || player.Position || player.position
+        const team = player.Team || player.team
+        const rank = player.Rank || player.rank
+
+        const searchName = name.replace('Jr', '').replace('III', '').replace('II', '').replace('IV', '').replace(/[^0-9a-z]/gi, '').toLowerCase()
+        let match_ids = []
+        let i = 2
+        while (match_ids.length !== 1) {
+            const matches = Object.keys(allplayers)
+                .filter(player_id =>
+                    allplayers[player_id].searchName.slice(0, i) === searchName.slice(0, i) &&
+                    allplayers[player_id].searchName.slice(
+                        allplayers[player_id].searchName.length - i, allplayers[player_id].searchName.length
+                    ) === searchName.slice(searchName.length - i, searchName.length) &&
+                    allplayers[player_id].position === position
+                )
+            if (matches.length > 0) {
+                if (matches.length === 1) {
+                    r.push({
+                        player_id: matches[0],
+                        rank: rank
+                    })
+                }
+                match_ids = matches
+                i = i + 1
+            } else {
+                unmatched_players.push(name)
+                match_ids = [false]
+            }
+        }
+    })
+
+    return {
+        rankings: r,
+        unmatched_players: unmatched_players,
+        alerts: alerts
+    }
+}
+
+export const getNewRank = (rankings, prevRank, newRank, player_id, playerToIncrement, playerToIncrementRank) => {
+    let incrementedRank = playerToIncrementRank
+    if (playerToIncrement === player_id) {
+        incrementedRank = newRank
+    } else {
+        if (rankings[playerToIncrement].rank_ecr > prevRank && rankings[playerToIncrement].rank_ecr < 999) {
+            incrementedRank = parseInt(rankings[playerToIncrement].rank_ecr) - 1
+        }
+        if (incrementedRank >= newRank && rankings[playerToIncrement].rank_ecr < 999) {
+            incrementedRank = parseInt(incrementedRank) + 1
+        }
+    }
+    return incrementedRank
 }

@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { avatar } from "../misc_functions";
-import { getNewRank } from "../projections_stats";
 import { writeFile, utils, read } from 'xlsx';
+import { matchUploadedRankings, getNewRank } from './lineupFunctions';
 import fantasypros_icon from '../../images/FantasyPros.jpeg'
 const Search = React.lazy(() => import('../search'));
 
-const PlayersRankProj = ({ playershares, allplayers, sendRankEdit }) => {
+const PlayersRankProj = ({ playershares, allplayers, sendRankEdit, tab, setTab }) => {
     const [edit, setEdit] = useState(false)
     const [rankings, setRankings] = useState({})
     const [page, setPage] = useState(1)
@@ -20,21 +20,25 @@ const PlayersRankProj = ({ playershares, allplayers, sendRankEdit }) => {
         setRankings(allplayers)
     }, [allplayers])
 
-    const handleRankChange = (e, player_id) => {
+    const handleRankChange = (players_to_update) => {
         let r = rankings
-        const prevRank = rankings[player_id].rank_ecr
-        const newRank = parseInt(e.target.value) || ' '
 
-        if ((newRank >= 0 && newRank <= 1000) || e.target.value.trim() === '') {
-            Object.keys(rankings)
-                .map((player, index) => {
-                    rankings[player].original_rank = rankings[player].original_rank || rankings[player].rank_ecr
-                    let incrementedRank = rankings[player].rank_ecr
-                    incrementedRank = getNewRank(rankings, prevRank, newRank, player_id, player, incrementedRank)
-                    rankings[player].rank_ecr = incrementedRank
-                })
-            setRankings({ ...r })
-        }
+        players_to_update.map(player_to_update => {
+            const prevRank = r[player_to_update.player_id].rank_ecr
+            const newRank = parseInt(player_to_update.rank) || ' '
+
+            if ((newRank >= 0 && newRank <= 1000) || player_to_update.rank.trim() === '') {
+                Object.keys(r)
+                    .map((player, index) => {
+                        r[player].original_rank = r[player].original_rank || r[player].rank_ecr
+                        let incrementedRank = r[player].rank_ecr
+                        incrementedRank = getNewRank(r, prevRank, newRank, player_to_update.player_id, player, incrementedRank)
+                        r[player].rank_ecr = incrementedRank
+                    })
+            }
+        })
+
+        setRankings({ ...r })
     }
 
     const handleRankSave = () => {
@@ -65,7 +69,8 @@ const PlayersRankProj = ({ playershares, allplayers, sendRankEdit }) => {
     }
 
     const importRankings = (e) => {
-        if (e.target.files) {
+        if (e.target.files[0]) {
+            console.log(e.target.files[0])
             const reader = new FileReader()
             reader.onload = (e) => {
                 let r = allplayers
@@ -74,16 +79,27 @@ const PlayersRankProj = ({ playershares, allplayers, sendRankEdit }) => {
                 const sheetName = workbook.SheetNames[0]
                 const worksheet = workbook.Sheets[sheetName]
                 let json = utils.sheet_to_json(worksheet)
-                json.map(player =>
-                    r[player.id] = {
-                        ...r[player.id],
-                        original_rank: r[player.id].rank_ecr,
-                        rank_ecr: player.rank,
-                        past_rank: player.fantasypros
-                    }
-                )
-                console.log(r)
-                setRankings({ ...r })
+                const uploadKeys = Object.keys(json[0])
+                if (uploadKeys.includes('id')) {
+                    json.map(player => {
+                        if (Object.keys(allplayers).includes(player.id)) {
+                            r[player.id] = {
+                                ...r[player.id],
+                                original_rank: r[player.id]?.rank_ecr,
+                                rank_ecr: player.rank,
+                                past_rank: player.fantasypros
+                            }
+                        }
+                    })
+                    setRankings({ ...r })
+                } else {
+                    const positions = json.map(player => player.Pos || player.pos || player.Position || player.position)
+
+                    r = matchUploadedRankings(json, allplayers)
+                    handleRankChange(r.rankings)
+
+                }
+
                 setEdit(true)
             }
             reader.readAsArrayBuffer(e.target.files[0])
@@ -230,7 +246,7 @@ const PlayersRankProj = ({ playershares, allplayers, sendRankEdit }) => {
                                                             <input
                                                                 className={'editRank'}
                                                                 value={rankings[player.id]?.rank_ecr}
-                                                                onChange={(e) => handleRankChange(e, player.id)}
+                                                                onChange={(e) => handleRankChange([{ rank: e.target.value, player_id: player.id }])}
                                                             />
                                                             : null
 
@@ -342,11 +358,20 @@ const PlayersRankProj = ({ playershares, allplayers, sendRankEdit }) => {
             </ol>
         </div>
         <div className={`nav1`}>
-            <button
-                className={'active clickable'}
-            >
-                {`Week ${week} Rankings`}
-            </button>
+            <div className={'nav1_button_wrapper'}>
+                <button
+                    className={tab === 'Weekly Rankings' ? 'active clickable' : 'clickable'}
+                    onClick={() => setTab('Weekly Rankings')}
+                >
+                    Weekly Rankings
+                </button>
+                <button
+                    className={tab === 'Lineup Check' ? 'active clickable' : 'clickable'}
+                    onClick={() => setTab('Lineup Check')}
+                >
+                    Lineup Check
+                </button>
+            </div>
         </div>
         <table className="main">
             <thead className="main">

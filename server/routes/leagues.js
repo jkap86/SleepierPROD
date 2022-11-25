@@ -76,47 +76,57 @@ const updateAllLeagues = async (axios, leagues_table) => {
         }
     })
     let updateCount = 0
-    await Promise.all(leagues_to_update.map(async league_to_update => {
-        const [league, users, rosters] = await Promise.all([
-            await axios.get(`http://api.sleeper.app/v1/league/${league_to_update.league_id}`),
-            await axios.get(`http://api.sleeper.app/v1/league/${league_to_update.league_id}/users`),
-            await axios.get(`http://api.sleeper.app/v1/league/${league_to_update.league_id}/rosters`)
-        ])
 
-        const new_league = await leagues_table.update({
-            name: league.data.name,
-            avatar: league.data.avatar,
-            best_ball: league.data.settings.best_ball,
-            type: league.data.settings.type,
-            scoring_settings: league.data.scoring_settings,
-            roster_positions: league.data.roster_positions,
-            users: users.data,
-            rosters: rosters.data
-        }, {
-            where: {
-                league_id: league_to_update.league_id
-            }
-        })
-        updateCount += parseInt(...new_league)
-    }))
+    let i = 0
+    while (i < leagues_to_update.length) {
+        await Promise.all(leagues_to_update.map(async league_to_update => {
+            const [league, users, rosters] = await Promise.all([
+                await axios.get(`http://api.sleeper.app/v1/league/${league_to_update.league_id}`),
+                await axios.get(`http://api.sleeper.app/v1/league/${league_to_update.league_id}/users`),
+                await axios.get(`http://api.sleeper.app/v1/league/${league_to_update.league_id}/rosters`)
+            ])
+
+            const new_league = await leagues_table.update({
+                name: league.data.name,
+                avatar: league.data.avatar,
+                best_ball: league.data.settings.best_ball,
+                type: league.data.settings.type,
+                scoring_settings: league.data.scoring_settings,
+                roster_positions: league.data.roster_positions,
+                users: users.data,
+                rosters: rosters.data
+            }, {
+                where: {
+                    league_id: league_to_update.league_id
+                }
+            })
+            updateCount += parseInt(...new_league)
+        }))
+        i += 500
+    }
     return updateCount.toString()
 }
 
 const updateAllLeagues_Rosters = async (axios, leagues_table) => {
     const leagues_to_update = await leagues_table.findAll()
     let updateCount = 0
-    await Promise.all(leagues_to_update.map(async league_to_update => {
-        const rosters = await axios.get(`http://api.sleeper.app/v1/league/${league_to_update.league_id}/rosters`)
 
-        const new_league = await leagues_table.update({
-            rosters: rosters.data
-        }, {
-            where: {
-                league_id: league_to_update.league_id
-            }
-        })
-        updateCount += parseInt(...new_league)
-    }))
+    let i = 0
+    while (i < leagues_to_update.length) {
+        await Promise.all(leagues_to_update.slice(i, i + 500).map(async league_to_update => {
+            const rosters = await axios.get(`http://api.sleeper.app/v1/league/${league_to_update.league_id}/rosters`)
+
+            const new_league = await leagues_table.update({
+                rosters: rosters.data
+            }, {
+                where: {
+                    league_id: league_to_update.league_id
+                }
+            })
+            updateCount += parseInt(...new_league)
+        }))
+        i += 500
+    }
     return updateCount.toString()
 }
 

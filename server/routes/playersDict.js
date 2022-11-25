@@ -35,6 +35,7 @@ const getPlayersDict = async (axios, week) => {
 
         allplayers[sleeper_id] = {
             full_name: sleeper_player?.full_name,
+            searchName: sleeper_player?.search_full_name,
             position: sleeper_player?.position,
             team: sleeper_player?.team || 'FA',
             fantasypros_id: dynProc_player?.fantasypros_id.toString(),
