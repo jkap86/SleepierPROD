@@ -4,10 +4,12 @@ const cors = require('cors')
 const compression = require('compression')
 const path = require('path')
 const Sequelize = require('sequelize')
+const https = require('https');
 const axios = require('axios').create({
     headers: {
         'content-type': 'application/json'
     },
+    httpsAgent: new https.Agent({ rejectUnauthorized: false }),
     timeout: 5000
 })
 const { bootServer } = require('./routes/bootServer');
