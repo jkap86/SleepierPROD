@@ -15,7 +15,7 @@ const axios = require('axios').create({
 const { bootServer } = require('./routes/bootServer');
 const { getUser, updateUser } = require('./routes/user');
 const { updateLeaguesUser, updateLeague } = require('./routes/leagues');
-const { sync_daily } = require('./routes/sync');
+const { sync_daily, rankings_sync } = require('./routes/sync');
 
 app.use(compression())
 app.use(cors());
@@ -37,7 +37,9 @@ setTimeout(async () => {
         sync_daily(app, axios, app.get('leagues_table')), 24 * 60 * 60 * 1 * 1000)
 }, delay)
 
-
+setInterval(async () => {
+    rankings_sync(app, axios)
+}, 5 * 60 * 1000)
 
 app.get('/user', async (req, res, next) => {
     const user = await getUser(axios, req.query.username)
