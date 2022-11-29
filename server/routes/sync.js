@@ -13,7 +13,7 @@ const sync_daily = async (app, axios, leagues_table) => {
 const sync_15min = async (app, axios, leagues_table) => {
     console.log(`league rosters updating at ${new Date()}...`)
     const updateCount = await updateAllLeagues_Rosters(axios, leagues_table)
-
+    console.log(`${updateCount} leagues' rosters updated at ${new Date()}...`)
     let allplayers = app.get('allplayers')
     const html = await axios.get('https://www.fantasypros.com/nfl/rankings/ppr-superflex.php')
     const weekly_rankings = await getWeeklyRankings(html.data)

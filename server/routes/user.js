@@ -21,6 +21,17 @@ const updateUser = async (axios, users_table, user, season) => {
             [`${season}_leagues`]: league_ids
         }
     })
+    if (!created) {
+        await users_table.update({
+            username: user.display_name,
+            avatar: user.avatar,
+            [`${season}_leagues`]: league_ids
+        }, {
+            where: {
+                user_id: user.user_id
+            }
+        })
+    }
     return {
         user: user_db,
         leagues: leagues.data

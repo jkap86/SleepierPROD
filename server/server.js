@@ -31,7 +31,7 @@ bootServer(app, axios, db)
 const date = new Date()
 const hour = date.getHours()
 const minute = date.getMinutes()
-const delay = ((Math.max(4 - hour, 27 - hour) * 60) + (60 - minute)) * 60 * 1000
+const delay = ((Math.max(4 - hour, 28 - hour) * 60) + (60 - minute)) * 60 * 1000
 setTimeout(async () => {
     setInterval(async () => {
         console.log(`Begin daily sync at ${new Date()}`)
@@ -39,6 +39,10 @@ setTimeout(async () => {
         console.log(`Daily sync completed at ${new Date()}`)
     }, 24 * 60 * 60 * 1 * 1000)
 }, delay)
+
+setTimeout(async () => {
+    sync_15min(app, axios, app.get('leagues_table'))
+}, 15 * 1000)
 
 setInterval(async () => {
     console.log(`Begin 15min sync at ${new Date()}`)
