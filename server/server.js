@@ -40,10 +40,6 @@ setTimeout(async () => {
     }, 24 * 60 * 60 * 1 * 1000)
 }, delay)
 
-setTimeout(async () => {
-    sync_15min(app, axios, app.get('leagues_table'))
-}, 15 * 1000)
-
 setInterval(async () => {
     console.log(`Begin 15min sync at ${new Date()}`)
     sync_15min(app, axios, app.get('leagues_table'))
