@@ -15,7 +15,7 @@ const axios = require('axios').create({
 const { bootServer } = require('./routes/bootServer');
 const { getUser, updateUser } = require('./routes/user');
 const { updateLeaguesUser, updateLeague } = require('./routes/leagues');
-const { sync_daily, sync_15min } = require('./routes/sync');
+const { sync_daily } = require('./routes/sync');
 
 app.use(compression())
 app.use(cors());
@@ -33,18 +33,11 @@ const hour = date.getHours()
 const minute = date.getMinutes()
 const delay = ((Math.max(4 - hour, 28 - hour) * 60) + (60 - minute)) * 60 * 1000
 setTimeout(async () => {
-    setInterval(async () => {
-        console.log(`Begin daily sync at ${new Date()}`)
-        sync_daily(app, axios, app.get('leagues_table'))
-        console.log(`Daily sync completed at ${new Date()}`)
-    }, 24 * 60 * 60 * 1 * 1000)
+    setInterval(async () =>
+        sync_daily(app, axios, app.get('leagues_table')), 24 * 60 * 60 * 1 * 1000)
 }, delay)
 
-setInterval(async () => {
-    console.log(`Begin 15min sync at ${new Date()}`)
-    sync_15min(app, axios, app.get('leagues_table'))
-    console.log(`15 min sync completed at ${new Date()}`)
-}, 15 * 60 * 1 * 1000)
+
 
 app.get('/user', async (req, res, next) => {
     const user = await getUser(axios, req.query.username)
